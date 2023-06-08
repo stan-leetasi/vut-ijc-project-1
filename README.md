@@ -14,7 +14,7 @@ This program implements a bitset data structure and utilizes it to find prime nu
 
 1. To compile the program, use the provided makefile:
 
-`make`	Compile both the regular version (primes) and the version with inline functions (primes-i)
+`make`	Compiles both the regular version (primes) and the version with inline functions (primes-i)
 
 2. To run the program:
 
