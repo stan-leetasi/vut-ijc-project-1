@@ -1,15 +1,16 @@
 // error.c
-// Řešení IJC-DU1, příklad a), 16.3.2023
-// Autor: Stanislav Letaši, FIT
-// Přeloženo: gcc 11.3.0
-// Modul na výpis chybových hlášok
+// 16.3.2023
+// Author: Stanislav Letaši, FIT
+// Compiled with: gcc 11.3.0
+// Module that prints out error messages
+
 #include <stdio.h>
 #include <stdlib.h>
 typedef unsigned long bitset_index_t;
 
-void error_exit(bitset_index_t index, unsigned long mez)
+unsigned long error_exit(bitset_index_t index, unsigned long array_end)
 {
-    printf("bitset_getbit: Index %lu mimo rozsah 0..%lu",index, mez);
+    printf("bitset_getbit: Index %lu out of range 0..%lu",index, array_end);
     exit(1);
 }
     

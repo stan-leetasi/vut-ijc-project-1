@@ -1,8 +1,8 @@
 // bitset.c
-// Řešení IJC-DU1, příklad a), 16.3.2023
-// Autor: Stanislav Letaši, FIT
-// Přeloženo: gcc 11.3.0
-// Deklaracia inline funkcií aby splňovali požiadavku O0
+// 16.3.2023
+// Author: Stanislav Letaši, FIT
+// Compiled with: gcc 11.3.0
+// Inline functions declaration, so they will conform with the O0 requirement
 
 #include "bitset.h"
 

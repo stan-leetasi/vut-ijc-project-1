@@ -1,10 +1,12 @@
 // bitset.h
-// Řešení IJC-DU1, příklad a), 16.3.2023
-// Autor: Stanislav Letaši, FIT
-// Přeloženo: gcc 11.3.0
-// Definícia dátovej štruktúry bitové pole
+// 16.3.2023
+// Author: Stanislav Letaši, FIT
+// Compiled with: gcc 11.3.0
+// Bit array data structure definition
 
 #include <assert.h>
+#include <stdlib.h>
+#include "error.h"
 #ifndef FILES_BITSET_H
 #define FILES_BITSET_H 1
 
@@ -14,90 +16,79 @@ typedef unsigned long bitset_index_t;
 
 #define long_bits (8 * sizeof(unsigned long))
 
-// definuje a _nuluje_ proměnnou jmeno_pole
-#define bitset_create(jmeno_pole, velikost)                                                     \
-    static_assert(velikost > 0 && velikost < 250000000, "bitset_create: velkost musi byt > 0"); \
-    unsigned long jmeno_pole[((velikost - 1) / (long_bits)) + 2] = {0};                         \
-    jmeno_pole[0] = velikost
+// defines and zeroes out the array_name variable
+#define bitset_create(array_name, array_size)                                                     \
+    static_assert(array_size > 0 && array_size < 250000000, "ERR in bitset_create: array size must be > 0"); \
+    unsigned long array_name[((array_size - 1) / (long_bits)) + 2] = {0};                         \
+    array_name[0] = array_size
 
-// definuje proměnnou jmeno_pole tak, aby byla kompatibilní s polem vytvořeným pomocí bitset_create, ale pole bude alokováno dynamicky.
-#define bitset_alloc(jmeno_pole, velikost)                                                                                 \
-    assert(velikost > 0 && velikost < 250000000 && "bitset_alloc: velkost musi byt velikost > 0 && velikost < 250000000"); \
-    bitset_t jmeno_pole = calloc((((velikost - 1) / (long_bits)) + 2), sizeof(unsigned long));                             \
-    assert(jmeno_pole != NULL && "bitset_alloc: alokacia pamate zlyhala");                                                 \
-    jmeno_pole[0] = velikost
+// defines the array_name variable in a way to make it compatible with an array created by bitset_create, but the array will be allocated dynamically
+#define bitset_alloc(array_name, array_size)                                                                                 \
+    assert(array_size > 0 && array_size < 250000000 && "ERR in bitset_alloc: array size must be > 0 && array_size < 250000000"); \
+    bitset_t array_name = calloc((((array_size - 1) / (long_bits)) + 2), sizeof(unsigned long));                             \
+    assert(array_name != NULL && "ERR in bitset_alloc: memory allocation failed");                                                 \
+    array_name[0] = array_size
 
 #ifndef USE_INLINE
 
-// uvolní paměť dynamicky (bitset_alloc) alokovaného pole
-#define bitset_free(jmeno_pole) free(jmeno_pole)
+// frees memory of the dynamically allocated array
+#define bitset_free(array_name) free(array_name)
 
-// vrátí deklarovanou velikost pole v bitech (uloženou v poli)
-#define bitset_size(jmeno_pole) jmeno_pole[0]
+// returns the declared array_size of an array in bits
+#define bitset_size(array_name) array_name[0]
 
-// nastaví zadaný bit v poli na hodnotu zadanou výrazem (0 alebo 1)
-#define bitset_setbit(jmeno_pole, index, vyraz)                                                                                                                       \
+// sets bit in array_name on the index position to a bit_value
+#define bitset_setbit(array_name, index, bit_value)                                                                                                                       \
     do                                                                                                                                                                \
     {                                                                                                                                                                 \
-        if (index < 0)                                                                                                                                                \
+        if ((index) >= array_name[0])                                                                                                                                 \
         {                                                                                                                                                             \
-            error_exit(index, jmeno_pole[0]);                                                                                                                         \
+            error_exit((index), array_name[0]);                                                                                                                       \
         }                                                                                                                                                             \
-        if ((index) >= jmeno_pole[0])                                                                                                                                 \
-        {                                                                                                                                                             \
-            error_exit((index), jmeno_pole[0]);                                                                                                                       \
-        }                                                                                                                                                             \
-        unsigned long value = jmeno_pole[(index) / (long_bits) + 1];                                                                                                  \
-        (vyraz) > (0) ? (value = ((1ul << ((long_bits) - (index % long_bits) - 1)) | value)) : (value = (~(1ul << ((long_bits) - (index % long_bits) - 1)) & value)); \
-        jmeno_pole[(index) / (long_bits) + 1] = value;                                                                                                                \
+        unsigned long value = array_name[(index) / (long_bits) + 1];                                                                                                  \
+        (bit_value) > (0) ? (value = ((1ul << ((long_bits) - (index % long_bits) - 1)) | value)) : (value = (~(1ul << ((long_bits) - (index % long_bits) - 1)) & value)); \
+        array_name[(index) / (long_bits) + 1] = value;                                                                                                                \
     } while (0)
 
-// získá hodnotu zadaného bitu, vrací hodnotu 0 nebo 1
-#define bitset_getbit(jmeno_pole, index) ((index >= 0) && ((index < jmeno_pole[0])) ? ((jmeno_pole[(index) / (long_bits) + 1] >> ((long_bits) - (index % long_bits) - 1)) & 1) : (error_exit(index, jmeno_pole[0])))
-
-unsigned long error_exit(bitset_index_t index, unsigned long mez);
+// returns the bit bit_value from array_name on position index
+#define bitset_getbit(array_name, index) ((index < array_name[0]) ? ((array_name[(index) / (long_bits) + 1] >> ((long_bits) - (index % long_bits) - 1)) & 1) : (error_exit(index, array_name[0])))
 
 #endif
-
 #ifdef USE_INLINE
 
-inline void bitset_free(unsigned long *jmeno_pole){
-    free(jmeno_pole);
+inline void bitset_free(unsigned long *array_name){
+    free(array_name);
 }
 
-inline unsigned long bitset_size(unsigned long *jmeno_pole){
-    return jmeno_pole[0];
+inline unsigned long bitset_size(unsigned long *array_name){
+    return array_name[0];
 }
 
-inline void bitset_setbit(unsigned long *jmeno_pole, unsigned long index, unsigned long vyraz){                                                                                                                                                                 \
-    if (index < 0)                                                                                                                                                
+inline void bitset_setbit(unsigned long *array_name, unsigned long index, unsigned long bit_value){                                                                                                                                                                                                                                                                                                              
+    if ((index) >= array_name[0])                                                                                                                                 
     {                                                                                                                                                             
-        error_exit(index, jmeno_pole[0]);                                                                                                                         
+        error_exit((index), array_name[0]);                                                                                                                       
     }                                                                                                                                                             
-    if ((index) >= jmeno_pole[0])                                                                                                                                 
-    {                                                                                                                                                             
-        error_exit((index), jmeno_pole[0]);                                                                                                                       
-    }                                                                                                                                                             
-    unsigned long value = jmeno_pole[(index) / (long_bits) + 1];                                                                                                  
-    if(vyraz > 0){
+    unsigned long value = array_name[(index) / (long_bits) + 1];                                                                                                  
+    if(bit_value > 0){
         value = ((1ul << ((long_bits) - (index % long_bits) - 1)) | value);
 
     }
     else{
         value = (~(1ul << ((long_bits) - (index % long_bits) - 1)) & value);                                                                                                                
     }
-    jmeno_pole[(index) / (long_bits) + 1] = value;
+    array_name[(index) / (long_bits) + 1] = value;
 }
 
-inline unsigned long bitset_getbit(unsigned long *jmeno_pole, unsigned long index){
-    if (index >= 0 && index < jmeno_pole[0]){
-    return((jmeno_pole[(index) / (long_bits) + 1] >> ((long_bits) - (index % long_bits) - 1)) & 1);
+inline unsigned long bitset_getbit(unsigned long *array_name, unsigned long index){
+    if (index < array_name[0]){
+        return((array_name[(index) / (long_bits) + 1] >> ((long_bits) - (index % long_bits) - 1)) & 1);
     }
     else{
-        error_exit(index, jmeno_pole[0]);
-    } 
-
-} 
+        error_exit(index, array_name[0]);
+        return 1;
+    }
+}
 
 #endif
 #endif

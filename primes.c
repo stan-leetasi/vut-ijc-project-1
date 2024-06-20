@@ -1,8 +1,8 @@
 // bitset.h
-// Řešení IJC-DU1, příklad a), 16.3.2023
-// Autor: Stanislav Letaši, FIT
-// Přeloženo: gcc 11.3.0
-// Výpis posledných 10-tich prvočísel od 230000000
+// 16.3.2023
+// Author: Stanislav Letaši, FIT
+// Compiled with: gcc 11.3.0
+// Prints out the last 10 prime numbers from 230000000
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,13 +12,13 @@
 #define LIMIT 230000000
 
 
-void Eratosthenes(bitset_t pole);
+void Eratosthenes(bitset_t array_name);
 
 int main(){
     clock_t start=clock();
-    bitset_create(pole,LIMIT);
+    bitset_create(array_name,LIMIT);
 
-    Eratosthenes(pole);
+    Eratosthenes(array_name);
 
     unsigned long bit;
     int counter=10;
@@ -26,7 +26,7 @@ int main(){
 
     for(unsigned long i=LIMIT-1; i>0;i--)
     {
-        bit = bitset_getbit(pole,i);
+        bit = bitset_getbit(array_name,i);
         if(bit == 0)
         {
             counter--;

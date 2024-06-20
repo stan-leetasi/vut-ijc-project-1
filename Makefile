@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS= -g -Wextra -Wall -pedantic -std=c11 -O2 -Wno-unused-value
+CFLAGS= -g -Wextra -Wall -pedantic -std=c11 -O0 -Wno-unused-value
 default: primes primes-i
 
 primes: primes.o eratosthenes.o error.o
